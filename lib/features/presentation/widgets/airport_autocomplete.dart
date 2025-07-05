@@ -4,12 +4,14 @@ class AirportAutocomplete extends StatelessWidget {
   final TextEditingController controller;
   final String labelText;
   final String? Function(String?)? validator;
+  final IconData suffixIcon;
 
   const AirportAutocomplete({
     super.key,
     required this.controller,
     required this.labelText,
     this.validator,
+    required this.suffixIcon,
   });
 
   @override
@@ -40,8 +42,10 @@ class AirportAutocomplete extends StatelessWidget {
               focusNode: fieldFocusNode,
               decoration: InputDecoration(
                 labelText: labelText,
+                suffixIcon: Icon(suffixIcon),
                 border: const OutlineInputBorder(),
               ),
+
               validator: validator,
             );
           },

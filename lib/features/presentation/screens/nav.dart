@@ -3,14 +3,14 @@ import 'package:flight_test/features/presentation/screens/flight_search_screen.d
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+class NavScreen extends StatefulWidget {
+  const NavScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  State<NavScreen> createState() => _NavScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _NavScreenState extends State<NavScreen> {
   int _currentIndex = 0;
 
   final List<Widget> _screens = [FlightSearchScreen(), FavoritesScreen()];

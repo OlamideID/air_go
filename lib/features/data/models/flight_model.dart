@@ -1,3 +1,80 @@
+enum TravelClass {
+  economy('Economy'),
+  premiumEconomy('Premium Economy'),
+  business('Business'),
+  first('First Class');
+
+  const TravelClass(this.displayName);
+  final String displayName;
+
+  static TravelClass fromString(String value) {
+    switch (value) {
+      case 'economy':
+        return TravelClass.economy;
+      case 'premiumEconomy':
+        return TravelClass.premiumEconomy;
+      case 'business':
+        return TravelClass.business;
+      case 'first':
+        return TravelClass.first;
+      default:
+        return TravelClass.economy;
+    }
+  }
+
+  String toJsonString() {
+    switch (this) {
+      case TravelClass.economy:
+        return 'economy';
+      case TravelClass.premiumEconomy:
+        return 'premiumEconomy';
+      case TravelClass.business:
+        return 'business';
+      case TravelClass.first:
+        return 'first';
+    }
+  }
+}
+
+enum TripType {
+  oneWay('One Way'),
+  roundTrip('Round Trip'),
+  multiCity('Multi-City');
+
+  const TripType(this.displayName);
+  final String displayName;
+
+  static TripType fromString(String value) {
+    switch (value.toLowerCase()) {
+      case 'oneway':
+      case 'one_way':
+      case 'one way':
+        return TripType.oneWay;
+      case 'roundtrip':
+      case 'round_trip':
+      case 'round trip':
+        return TripType.roundTrip;
+      case 'multicity':
+      case 'multi_city':
+      case 'multi city':
+        return TripType.multiCity;
+      default:
+        return TripType.oneWay;
+    }
+  }
+
+  String toJsonString() {
+    switch (this) {
+      case TripType.oneWay:
+        return 'one_way';
+      case TripType.roundTrip:
+        return 'round_trip';
+      case TripType.multiCity:
+        return 'multi_city';
+    }
+  }
+}
+
 class FlightModel {
   final String id;
   final String airline;
@@ -11,6 +88,8 @@ class FlightModel {
   final String aircraft;
   final int duration;
   final List<String>? stops;
+  final TravelClass travelClass;
+  final TripType tripType;
 
   FlightModel({
     required this.id,
@@ -25,6 +104,8 @@ class FlightModel {
     required this.aircraft,
     required this.duration,
     this.stops,
+    required this.travelClass,
+    required this.tripType,
   });
 
   factory FlightModel.fromJson(Map<String, dynamic> json) {
@@ -41,6 +122,27 @@ class FlightModel {
       aircraft: json['aircraft'],
       duration: json['duration'],
       stops: json['stops'] != null ? List<String>.from(json['stops']) : null,
+      travelClass: TravelClass.fromString(json['travel_class'] ?? 'economy'),
+      tripType: TripType.fromString(json['trip_type'] ?? 'one_way'),
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'airline': airline,
+      'airline_logo': airlineLogo,
+      'flight_number': flightNumber,
+      'departure_airport': departureAirport,
+      'arrival_airport': arrivalAirport,
+      'departure_time': departureTime.toIso8601String(),
+      'arrival_time': arrivalTime.toIso8601String(),
+      'price': price,
+      'aircraft': aircraft,
+      'duration': duration,
+      'stops': stops,
+      'travel_class': travelClass.toJsonString(),
+      'trip_type': tripType.toJsonString(),
+    };
   }
 }

@@ -1,7 +1,7 @@
 import 'package:flight_test/features/data/datasources/flight_remote_data_source.dart';
+import 'package:flight_test/features/data/models/flight_model.dart';
 import 'package:flight_test/features/data/repositories/flight_repository_impl.dart';
 import 'package:flight_test/features/domain/entities/flight.dart';
-import 'package:flight_test/features/domain/repositories/flight_repository.dart';
 import 'package:flight_test/features/domain/usecases/search_flight.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -22,8 +22,15 @@ class FlightSearchState {
   final String? departure;
   final String? arrival;
   final DateTime? date;
+  final DateTime? returnDate;
+  final TripType? tripType;
+  final TravelClass? travelClass;
+  final int passengers;
+  final bool directOnly;
+  final bool includeNearbyAirports;
   final RangeValues? priceRange;
   final List<String> selectedAirlines;
+  final List<TravelClass> selectedTravelClasses;
   final SortOption sortOption;
 
   FlightSearchState({
@@ -33,8 +40,15 @@ class FlightSearchState {
     this.departure,
     this.arrival,
     this.date,
+    this.returnDate,
+    this.tripType,
+    this.travelClass,
+    this.passengers = 1,
+    this.directOnly = false,
+    this.includeNearbyAirports = false,
     this.priceRange,
     this.selectedAirlines = const [],
+    this.selectedTravelClasses = const [],
     this.sortOption = SortOption.priceLowToHigh,
   });
 
@@ -42,10 +56,8 @@ class FlightSearchState {
       FlightSearchState(status: FlightSearchStatus.initial);
 
   List<Flight> get filteredFlights {
-    // Create a new mutable list from the original flights
     List<Flight> result = List.from(flights);
 
-    // Apply price filter
     if (priceRange != null) {
       result = result.where((flight) {
         return flight.price >= priceRange!.start &&
@@ -53,14 +65,18 @@ class FlightSearchState {
       }).toList();
     }
 
-    // Apply airline filter
     if (selectedAirlines.isNotEmpty) {
-      result = result.where((flight) {
-        return selectedAirlines.contains(flight.airline);
-      }).toList();
+      result = result
+          .where((flight) => selectedAirlines.contains(flight.airline))
+          .toList();
     }
 
-    // Apply sorting
+    if (selectedTravelClasses.isNotEmpty) {
+      result = result
+          .where((flight) => selectedTravelClasses.contains(flight.travelClass))
+          .toList();
+    }
+
     switch (sortOption) {
       case SortOption.priceLowToHigh:
         result.sort((a, b) => a.price.compareTo(b.price));
@@ -86,8 +102,15 @@ class FlightSearchState {
     String? departure,
     String? arrival,
     DateTime? date,
+    DateTime? returnDate,
+    TripType? tripType,
+    TravelClass? travelClass,
+    int? passengers,
+    bool? directOnly,
+    bool? includeNearbyAirports,
     RangeValues? priceRange,
     List<String>? selectedAirlines,
+    List<TravelClass>? selectedTravelClasses,
     SortOption? sortOption,
   }) {
     return FlightSearchState(
@@ -97,19 +120,30 @@ class FlightSearchState {
       departure: departure ?? this.departure,
       arrival: arrival ?? this.arrival,
       date: date ?? this.date,
+      returnDate: returnDate ?? this.returnDate,
+      tripType: tripType ?? this.tripType,
+      travelClass: travelClass ?? this.travelClass,
+      passengers: passengers ?? this.passengers,
+      directOnly: directOnly ?? this.directOnly,
+      includeNearbyAirports:
+          includeNearbyAirports ?? this.includeNearbyAirports,
       priceRange: priceRange ?? this.priceRange,
       selectedAirlines: selectedAirlines ?? this.selectedAirlines,
+      selectedTravelClasses:
+          selectedTravelClasses ?? this.selectedTravelClasses,
       sortOption: sortOption ?? this.sortOption,
     );
   }
 }
 
+// Providers
 final flightRepositoryProvider = Provider<FlightRepository>((ref) {
   return FlightRepositoryImpl(remoteDataSource: FlightRemoteDataSourceImpl());
 });
 
-final searchFlightsProvider = Provider<SearchFlights>((ref) {
-  return SearchFlights(ref.read(flightRepositoryProvider));
+final searchFlightsProvider = Provider.autoDispose<SearchFlights>((ref) {
+  final repository = ref.watch(flightRepositoryProvider);
+  return SearchFlights(repository);
 });
 
 final flightSearchNotifierProvider =
@@ -126,6 +160,12 @@ class FlightSearchNotifier extends StateNotifier<FlightSearchState> {
     required String departure,
     required String arrival,
     required DateTime date,
+    DateTime? returnDate,
+    TripType? tripType,
+    TravelClass? travelClass,
+    int passengers = 1,
+    bool directOnly = false,
+    bool includeNearbyAirports = false,
   }) async {
     state = state.copyWith(status: FlightSearchStatus.loading);
 
@@ -134,6 +174,12 @@ class FlightSearchNotifier extends StateNotifier<FlightSearchState> {
         departure: departure,
         arrival: arrival,
         date: date,
+        returnDate: returnDate,
+        tripType: tripType,
+        travelClass: travelClass,
+        passengers: passengers,
+        directOnly: directOnly,
+        includeNearbyAirports: includeNearbyAirports,
       );
 
       state = state.copyWith(
@@ -142,6 +188,12 @@ class FlightSearchNotifier extends StateNotifier<FlightSearchState> {
         departure: departure,
         arrival: arrival,
         date: date,
+        returnDate: returnDate,
+        tripType: tripType,
+        travelClass: travelClass,
+        passengers: passengers,
+        directOnly: directOnly,
+        includeNearbyAirports: includeNearbyAirports,
       );
     } catch (e) {
       state = state.copyWith(
@@ -154,10 +206,12 @@ class FlightSearchNotifier extends StateNotifier<FlightSearchState> {
   void updateFilters({
     RangeValues? priceRange,
     List<String>? selectedAirlines,
+    List<TravelClass>? selectedTravelClasses,
   }) {
     state = state.copyWith(
       priceRange: priceRange,
       selectedAirlines: selectedAirlines,
+      selectedTravelClasses: selectedTravelClasses,
     );
   }
 
@@ -165,85 +219,32 @@ class FlightSearchNotifier extends StateNotifier<FlightSearchState> {
     state = state.copyWith(sortOption: option);
   }
 
-  // void showFilterDialog(BuildContext context) {
-  //   final airlines = state.flights.map((f) => f.airline).toSet().toList();
-
-  //   showDialog(
-  //     context: context,
-  //     builder: (context) {
-  //       return StatefulBuilder(
-  //         builder: (context, setState) {
-  //           RangeValues? tempPriceRange = state.priceRange;
-  //           List<String> tempSelectedAirlines = List.from(
-  //             state.selectedAirlines,
-  //           );
-
-  //           return AlertDialog(
-  //             title: const Text('Filter Flights'),
-  //             content: Column(
-  //               mainAxisSize: MainAxisSize.min,
-  //               children: [
-  //                 const Text('Price Range'),
-  //                 RangeSlider(
-  //                   values:
-  //                       tempPriceRange ??
-  //                       RangeValues(
-  //                         state.flights.map((f) => f.price).reduce(min),
-  //                         state.flights.map((f) => f.price).reduce(max),
-  //                       ),
-  //                   min: state.flights.map((f) => f.price).reduce(min),
-  //                   max: state.flights.map((f) => f.price).reduce(max),
-  //                   onChanged: (values) {
-  //                     setState(() => tempPriceRange = values);
-  //                   },
-  //                 ),
-  //                 const Text('Airlines'),
-  //                 ...airlines
-  //                     .map(
-  //                       (airline) => CheckboxListTile(
-  //                         title: Text(airline),
-  //                         value: tempSelectedAirlines.contains(airline),
-  //                         onChanged: (checked) {
-  //                           setState(() {
-  //                             if (checked!) {
-  //                               tempSelectedAirlines.add(airline);
-  //                             } else {
-  //                               tempSelectedAirlines.remove(airline);
-  //                             }
-  //                           });
-  //                         },
-  //                       ),
-  //                     )
-  //                     ,
-  //               ],
-  //             ),
-  //             actions: [
-  //               TextButton(
-  //                 onPressed: () {
-  //                   updateFilters(priceRange: null, selectedAirlines: []);
-  //                   Navigator.pop(context);
-  //                 },
-  //                 child: const Text('Reset'),
-  //               ),
-  //               TextButton(
-  //                 onPressed: () {
-  //                   updateFilters(
-  //                     priceRange: tempPriceRange,
-  //                     selectedAirlines: tempSelectedAirlines,
-  //                   );
-  //                   Navigator.pop(context);
-  //                 },
-  //                 child: const Text('Apply'),
-  //               ),
-  //             ],
-  //           );
-  //         },
-  //       );
-  //     },
-  //   );
-  // }
-
   void clearResults() {
-    state = state.copyWith(status: FlightSearchStatus.initial, flights: []);
+    state = state.copyWith(
+      status: FlightSearchStatus.initial,
+      flights: [],
+      travelClass: null,
+      selectedTravelClasses: [],
+    );
+  }
+
+  void setTravelClass(TravelClass travelClass) {
+    state = state.copyWith(travelClass: travelClass);
+  }
+
+  void setTripType(TripType tripType) {
+    state = state.copyWith(tripType: tripType);
+  }
+
+  void toggleTravelClassFilter(TravelClass travelClass) {
+    final current = List<TravelClass>.from(state.selectedTravelClasses);
+    current.contains(travelClass)
+        ? current.remove(travelClass)
+        : current.add(travelClass);
+    state = state.copyWith(selectedTravelClasses: current);
+  }
+
+  void clearTravelClassFilters() {
+    state = state.copyWith(selectedTravelClasses: []);
   }
 }

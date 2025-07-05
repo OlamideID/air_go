@@ -1,6 +1,21 @@
+// Updated flight_repository.dart (domain layer)
 import 'package:flight_test/features/data/datasources/flight_remote_data_source.dart';
+import 'package:flight_test/features/data/models/flight_model.dart';
 import 'package:flight_test/features/domain/entities/flight.dart';
-import 'package:flight_test/features/domain/repositories/flight_repository.dart';
+
+abstract class FlightRepository {
+  Future<List<Flight>> searchFlights({
+    required String departure,
+    required String arrival,
+    required DateTime date,
+    DateTime? returnDate,
+    TripType? tripType,
+    TravelClass? travelClass,
+    bool directOnly = false,
+    bool includeNearbyAirports = false,
+    int passengers = 1,
+  });
+}
 
 class FlightRepositoryImpl implements FlightRepository {
   final FlightRemoteDataSource remoteDataSource;
@@ -12,32 +27,44 @@ class FlightRepositoryImpl implements FlightRepository {
     required String departure,
     required String arrival,
     required DateTime date,
+    DateTime? returnDate,
+    TripType? tripType,
+    TravelClass? travelClass,
+    bool directOnly = false,
+    bool includeNearbyAirports = false,
+    int passengers = 1,
   }) async {
     try {
       final flightModels = await remoteDataSource.searchFlights(
         departure: departure,
         arrival: arrival,
         date: date,
+        returnDate: returnDate,
+        tripType: tripType,
+        travelClass: travelClass,
+        directOnly: directOnly,
+        includeNearbyAirports: includeNearbyAirports,
+        passengers: passengers,
       );
 
-      return flightModels
-          .map(
-            (model) => Flight(
-              id: model.id,
-              airline: model.airline,
-              airlineLogo: model.airlineLogo,
-              flightNumber: model.flightNumber,
-              departureAirport: model.departureAirport,
-              arrivalAirport: model.arrivalAirport,
-              departureTime: model.departureTime,
-              arrivalTime: model.arrivalTime,
-              price: model.price,
-              aircraft: model.aircraft,
-              duration: model.duration,
-              stops: model.stops,
-            ),
-          )
-          .toList();
+      return flightModels.map((model) => Flight(
+        id: model.id,
+        airline: model.airline,
+        airlineLogo: model.airlineLogo,
+        flightNumber: model.flightNumber,
+        departureAirport: model.departureAirport,
+        arrivalAirport: model.arrivalAirport,
+        departureTime: model.departureTime,
+        arrivalTime: model.arrivalTime,
+        price: model.price,
+        aircraft: model.aircraft,
+        duration: model.duration,
+        stops: model.stops,
+        travelClass: model.travelClass,
+        tripType: model.tripType,
+        passengers: passengers, // <-- Pass the requested passengers count
+      )).toList();
+
     } catch (e) {
       throw Exception('Failed to search flights: $e');
     }

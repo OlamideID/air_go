@@ -1,7 +1,6 @@
-import 'package:flight_test/features/presentation/widgets/flight_search/search_button.dart';
+import 'package:flight_test/features/presentation/widgets/airport_autocomplete.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:flight_test/features/presentation/widgets/airport_autocomplete.dart';
 
 class FlightSearchForm extends StatefulWidget {
   final GlobalKey<FormState> formKey;
@@ -9,8 +8,6 @@ class FlightSearchForm extends StatefulWidget {
   final TextEditingController arrivalController;
   final DateTime? selectedDate;
   final VoidCallback onDateTap;
-  final VoidCallback onSearch;
-  final bool isSearching;
 
   const FlightSearchForm({
     super.key,
@@ -19,8 +16,6 @@ class FlightSearchForm extends StatefulWidget {
     required this.arrivalController,
     required this.selectedDate,
     required this.onDateTap,
-    required this.onSearch,
-    required this.isSearching,
   });
 
   @override
@@ -31,50 +26,29 @@ class _FlightSearchFormState extends State<FlightSearchForm> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          ),
-        ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Form(
-          key: widget.formKey,
-          child: Column(
-            children: [
-              buildStyledAutocomplete(
-                controller: widget.departureController,
-                label: 'From',
-                icon: Icons.flight_takeoff,
-                validator: (value) => value?.isEmpty ?? true
-                    ? 'Please select departure'
-                    : null,
-              ),
-              const SizedBox(height: 20),
-              buildStyledAutocomplete(
-                controller: widget.arrivalController,
-                label: 'To',
-                icon: Icons.flight_land,
-                validator: (value) => value?.isEmpty ?? true
-                    ? 'Please select arrival'
-                    : null,
-              ),
-              const SizedBox(height: 20),
-              buildDateField(),
-              const SizedBox(height: 32),
-              FlightSearchButton(
-                onPressed: widget.isSearching ? null : widget.onSearch,
-                isSearching: widget.isSearching,
-              ),
-            ],
-          ),
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Form(
+        key: widget.formKey,
+        child: Column(
+          children: [
+            buildStyledAutocomplete(
+              controller: widget.departureController,
+              label: 'From',
+              icon: Icons.keyboard_arrow_down,
+              validator: (value) =>
+                  value?.isEmpty ?? true ? 'Please select departure' : null,
+            ),
+            const SizedBox(height: 12),
+            buildStyledAutocomplete(
+              controller: widget.arrivalController,
+              label: 'To',
+              icon: Icons.keyboard_arrow_down,
+              validator: (value) =>
+                  value?.isEmpty ?? true ? 'Please select arrival' : null,
+            ),
+            const SizedBox(height: 12),
+            buildDateField(),
+          ],
         ),
       ),
     );
@@ -88,14 +62,14 @@ class _FlightSearchFormState extends State<FlightSearchForm> {
   }) {
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        color: const Color(0xFFF8FAFC),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        borderRadius: BorderRadius.circular(12),
+        color: const Color(0xFFF1F5F9),
       ),
       child: AirportAutocomplete(
         controller: controller,
         labelText: label,
         validator: validator,
+        suffixIcon: icon,
       ),
     );
   }
@@ -103,36 +77,35 @@ class _FlightSearchFormState extends State<FlightSearchForm> {
   Widget buildDateField() {
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        color: const Color(0xFFF8FAFC),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        borderRadius: BorderRadius.circular(12),
+        color: const Color(0xFFF1F5F9),
       ),
       child: TextFormField(
         readOnly: true,
         decoration: InputDecoration(
-          prefixIcon: const Icon(
-            Icons.calendar_today,
-            color: Color(0xFF1E40AF),
+          labelText: 'Departure Date',
+          labelStyle: const TextStyle(color: Color(0xFF64748B), fontSize: 14),
+          suffixIcon: const Icon(
+            Icons.keyboard_arrow_down,
+            color: Color(0xFF64748B),
           ),
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 16,
             vertical: 16,
           ),
-          hintText: widget.selectedDate == null
-              ? 'Select travel date'
-              : DateFormat('MMM dd, yyyy').format(widget.selectedDate!),
-          hintStyle: TextStyle(
-            color: widget.selectedDate == null
-                ? Colors.grey
-                : const Color(0xFF1E293B),
-          ),
+          floatingLabelBehavior: FloatingLabelBehavior.always,
         ),
         onTap: widget.onDateTap,
         validator: (value) =>
             widget.selectedDate == null ? 'Please select date' : null,
+        style: const TextStyle(color: Color(0xFF1E293B), fontSize: 16),
+        controller: TextEditingController(
+          text: widget.selectedDate == null
+              ? ''
+              : DateFormat('MMM dd, yyyy').format(widget.selectedDate!),
+        ),
       ),
     );
   }
 }
-

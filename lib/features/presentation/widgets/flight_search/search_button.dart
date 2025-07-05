@@ -1,61 +1,51 @@
 import 'package:flutter/material.dart';
 
-class FlightSearchButton extends StatelessWidget {
-  final VoidCallback? onPressed;
+class SearchButton extends StatelessWidget {
   final bool isSearching;
+  final VoidCallback onPressed;
 
-  const FlightSearchButton({
+  const SearchButton({
     super.key,
-    required this.onPressed,
     required this.isSearching,
+    required this.onPressed,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: double.infinity,
-      height: 56,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        gradient: const LinearGradient(
-          colors: [Color(0xFF1E40AF), Color(0xFF3B82F6)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+      padding: const EdgeInsets.all(16.0),
+      decoration: const BoxDecoration(
+        color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF1E40AF).withOpacity(0.3),
-            blurRadius: 12,
-            offset: const Offset(0, 6),
+            color: Color(0x1A000000),
+            blurRadius: 8,
+            offset: Offset(0, -2),
           ),
         ],
       ),
-      child: ElevatedButton(
-        onPressed: onPressed,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.transparent,
-          shadowColor: Colors.transparent,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+      child: SizedBox(
+        width: double.infinity,
+        height: 50,
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xFF2563EB),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
           ),
+          onPressed: isSearching ? null : onPressed,
+          child: isSearching
+              ? const CircularProgressIndicator(color: Colors.white)
+              : const Text(
+                  'Search Flights',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
         ),
-        child: isSearching
-            ? const SizedBox(
-                width: 24,
-                height: 24,
-                child: CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                  strokeWidth: 2,
-                ),
-              )
-            : const Text(
-                'Search Flights',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white,
-                ),
-              ),
       ),
     );
   }

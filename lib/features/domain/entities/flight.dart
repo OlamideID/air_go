@@ -1,3 +1,5 @@
+import 'package:flight_test/features/data/models/flight_model.dart';
+
 class Flight {
   final String id;
   final String airline;
@@ -11,6 +13,9 @@ class Flight {
   final String aircraft;
   final int duration;
   final List<String>? stops;
+  final TravelClass travelClass;
+  final TripType tripType;
+  final int passengers;
 
   Flight({
     required this.id,
@@ -25,9 +30,11 @@ class Flight {
     required this.aircraft,
     required this.duration,
     this.stops,
+    required this.travelClass,
+    required this.tripType,
+    required this.passengers,
   });
 
-  // Convert Flight to JSON
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -42,10 +49,12 @@ class Flight {
       'aircraft': aircraft,
       'duration': duration,
       'stops': stops,
+      'travelClass': travelClass.toJsonString(),
+      'tripType': tripType.name,
+      'passengers': passengers, 
     };
   }
 
-  // Create Flight from JSON
   factory Flight.fromJson(Map<String, dynamic> json) {
     return Flight(
       id: json['id'] as String,
@@ -60,6 +69,12 @@ class Flight {
       aircraft: json['aircraft'] as String,
       duration: json['duration'] as int,
       stops: json['stops'] != null ? List<String>.from(json['stops']) : null,
+      travelClass: TravelClass.fromString(json['travelClass'] ?? 'economy'),
+      tripType: TripType.values.firstWhere(
+        (t) => t.name == (json['tripType'] ?? 'oneWay'),
+        orElse: () => TripType.oneWay,
+      ),
+      passengers: json['passengers'] as int? ?? 1,
     );
   }
 
@@ -76,6 +91,9 @@ class Flight {
     String? aircraft,
     int? duration,
     List<String>? stops,
+    TravelClass? travelClass,
+    TripType? tripType,
+    int? passengers,
   }) {
     return Flight(
       id: id ?? this.id,
@@ -90,6 +108,19 @@ class Flight {
       aircraft: aircraft ?? this.aircraft,
       duration: duration ?? this.duration,
       stops: stops ?? this.stops,
+      travelClass: travelClass ?? this.travelClass,
+      tripType: tripType ?? this.tripType,
+      passengers: passengers ?? this.passengers,
     );
   }
+
+  bool get isDirect => stops == null || stops!.isEmpty;
+
+  String get formattedDuration {
+    final hours = duration ~/ 60;
+    final minutes = duration % 60;
+    return '${hours}h ${minutes}m';
+  }
+
+  String get formattedPrice => '\$${price.toStringAsFixed(2)}';
 }

@@ -1,6 +1,6 @@
 // lib/main.dart
 import 'package:flight_test/features/presentation/providers/favorites_provider.dart';
-import 'package:flight_test/features/presentation/screens/home.dart';
+import 'package:flight_test/features/presentation/screens/onboarding.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -27,7 +27,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
 
-      home: const HomeScreen(),
+      home: const OnboardingScreen(),
     );
   }
 }

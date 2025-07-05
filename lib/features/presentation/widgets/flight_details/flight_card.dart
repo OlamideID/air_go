@@ -1,3 +1,4 @@
+import 'package:flight_test/features/data/models/flight_model.dart';
 import 'package:flight_test/features/domain/entities/flight.dart';
 import 'package:flight_test/features/presentation/screens/flight_detail_screen.dart';
 import 'package:flight_test/features/presentation/widgets/flight_details/flight_duration_indicator.dart';
@@ -13,145 +14,192 @@ class FlightCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final timeFormat = DateFormat.Hm();
-
     return InkWell(
+      borderRadius: BorderRadius.circular(16),
       onTap: () {
         Navigator.push(
           context,
           MaterialPageRoute(builder: (_) => FlightDetailScreen(flight: flight)),
         );
       },
-      child: Card(
-        elevation: 4,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Container(
+        height: 180,
         margin: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: Container(
-                      color: Colors.grey.shade200,
-                      height: 36,
-                      width: 36,
-                      child: Image.asset(
-                        flight.airlineLogo ?? '',
-                        fit: BoxFit.fill,
-                        errorBuilder: (_, __, ___) =>
-                            const Icon(Icons.flight, size: 20),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      '${flight.airline} (${flight.flightNumber})',
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 6,
-                    ),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [Colors.blue.shade400, Colors.indigo.shade700],
-                      ),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Text(
-                      '₦${flight.price.toStringAsFixed(2)}',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Stack(
+          children: [
+            _buildBackground(),
+            _buildPriceTag(),
+            _buildStopInfo(),
+            _buildOverlayInfo(),
+          ],
+        ),
+      ),
+    );
+  }
 
-              const SizedBox(height: 20),
+  Widget _buildBackground() {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(16),
+      child: flight.airlineLogo != null && flight.airlineLogo!.isNotEmpty
+          ? Image.asset(
+              flight.airlineLogo!,
+              fit: BoxFit.cover,
+              width: double.infinity,
+              height: double.infinity,
+              errorBuilder: (_, __, ___) => _fallbackBackground(),
+            )
+          : _fallbackBackground(),
+    );
+  }
 
-              // Route info
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        flight.departureAirport,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 16,
-                        ),
-                      ),
-                      Text(
-                        timeFormat.format(flight.departureTime),
-                        style: const TextStyle(color: Colors.grey),
-                      ),
-                    ],
-                  ),
-                  Column(
-                    children: [
-                      const Icon(Icons.flight, color: Colors.blue, size: 20),
-                      Text(
-                        '${flight.duration ~/ 60}h ${flight.duration % 60}m',
-                        style: const TextStyle(fontSize: 12),
-                      ),
-                    ],
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text(
-                        flight.arrivalAirport,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 16,
-                        ),
-                      ),
-                      Text(
-                        timeFormat.format(flight.arrivalTime),
-                        style: const TextStyle(color: Colors.grey),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+  Widget _fallbackBackground() {
+    return Container(
+      width: double.infinity,
+      height: double.infinity,
+      color: Colors.grey.shade100,
+      child: const Center(
+        child: Icon(Icons.flight, size: 60, color: Colors.grey),
+      ),
+    );
+  }
 
-              const SizedBox(height: 8),
-
-              // Stop info
-              if (flight.stops != null && flight.stops!.isNotEmpty)
-                Padding(
-                  padding: const EdgeInsets.only(top: 8.0),
-                  child: Text(
-                    'Stop(s): ${flight.stops!.join(", ")}',
-                    style: const TextStyle(fontSize: 13, color: Colors.grey),
-                  ),
-                )
-              else
-                const Padding(
-                  padding: EdgeInsets.only(top: 8.0),
-                  child: Text(
-                    'Non-stop flight',
-                    style: TextStyle(fontSize: 13, color: Colors.grey),
-                  ),
-                ),
-            ],
+  Widget _buildPriceTag() {
+    return Positioned(
+      top: 16,
+      left: 16,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Text(
+          '₦${flight.price.toStringAsFixed(0)} • ${_className(flight.travelClass)}',
+          style: const TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
           ),
         ),
       ),
     );
+  }
+
+  Widget _buildStopInfo() {
+    return Positioned(
+      top: 16,
+      right: 16,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.9),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Text(
+          (flight.stops != null && flight.stops!.isNotEmpty)
+              ? '${flight.stops!.length} Stop${flight.stops!.length > 1 ? 's' : ''}'
+              : 'Non-stop',
+          style: TextStyle(
+            fontSize: 12,
+            color: (flight.stops != null && flight.stops!.isNotEmpty)
+                ? Colors.black
+                : Colors.green,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildOverlayInfo() {
+    final timeFormat = DateFormat.Hm();
+    return Positioned(
+      bottom: 16,
+      left: 16,
+      right: 16,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: Colors.black.withOpacity(0.6),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            _buildAirportTimeBlock(
+              code: flight.departureAirport,
+              time: timeFormat.format(flight.departureTime),
+              align: CrossAxisAlignment.start,
+            ),
+            Column(
+              children: [
+                const Icon(Icons.flight, color: Colors.white, size: 20),
+                Text(
+                  '${flight.duration ~/ 60}h ${flight.duration % 60}m',
+                  style: const TextStyle(color: Colors.white, fontSize: 12),
+                ),
+              ],
+            ),
+            _buildAirportTimeBlock(
+              code: flight.arrivalAirport,
+              time: timeFormat.format(flight.arrivalTime),
+              align: CrossAxisAlignment.end,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAirportTimeBlock({
+    required String code,
+    required String time,
+    required CrossAxisAlignment align,
+  }) {
+    return Column(
+      crossAxisAlignment: align,
+      children: [
+        Text(
+          code,
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 15,
+          ),
+        ),
+        Text(time, style: const TextStyle(color: Colors.white70, fontSize: 12)),
+      ],
+    );
+  }
+
+  String _className(TravelClass travelClass) {
+    switch (travelClass) {
+      case TravelClass.economy:
+        return 'Economy';
+      case TravelClass.business:
+        return 'Business';
+      case TravelClass.first:
+        return 'First';
+      default:
+        return 'Class';
+    }
   }
 }
 
@@ -228,7 +276,7 @@ class AdditionalInfoCard extends StatelessWidget {
           InfoRow(
             icon: Icons.event_seat,
             title: 'Seat Class',
-            value: 'Economy',
+            value: flight.travelClass.displayName,
           ),
           InfoRow(
             icon: Icons.luggage,
