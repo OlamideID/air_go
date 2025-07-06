@@ -426,16 +426,21 @@ class AdditionalInfoCard extends StatelessWidget {
             title: 'Booking Reference',
             subtitle: flight.flightNumber,
           ),
+          SizedBox(height: 10),
           InfoRow(
             icon: Icons.event_seat,
             title: 'Seat Class',
             subtitle: flight.travelClass.displayName,
           ),
+          SizedBox(height: 10),
+
           InfoRow(
             icon: Icons.luggage,
             title: 'Baggage',
             subtitle: '23kg included',
           ),
+          SizedBox(height: 10),
+
           InfoRow(icon: Icons.wifi, title: 'WiFi', subtitle: 'Available'),
         ],
       ),
