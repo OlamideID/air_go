@@ -163,6 +163,91 @@ flutter run
 
 ---
 
+## 🔧 Building APK
+
+To generate the APK file:
+
+```bash
+# For debug APK (faster build)
+flutter build apk --debug
+
+# For release APK (optimized)
+flutter build apk --release
+```
+
+The APK will be located at:
+- Debug: `build/app/outputs/flutter-apk/app-debug.apk`
+- Release: `build/app/outputs/flutter-apk/app-release.apk`
+
+---
+
+## 📧 Submission
+
+**GitHub Repository:** [https://github.com/olamideid/airgo](https://github.com/olamideid/airgo)
+
+**APK File:** Send the generated APK file to `itsupport@ridefiapp` along with this GitHub link.
+
+---
+
+## 🤔 Assumptions Made
+
+During development, I made the following assumptions:
+
+### **Data & API**
+- **Mock Data:** Since no live API was provided, I created comprehensive mock flight data covering domestic and international routes
+- **Flight Prices:** Assumed prices in Nigerian Naira (₦) based on realistic market rates
+- **Airport Codes:** Used standard IATA codes for all airports
+- **Flight Duration:** Calculated realistic flight times based on actual routes
+
+### **User Experience**
+- **Search Behavior:** Assumed users would want to see results immediately without complex filters initially
+- **Favorite Flights:** Assumed users would want to save flights for later comparison
+- **Date Selection:** Each mock flight has a predefined departure and return date
+- **Multi-passenger:** Assumed passengers would want seat assignments when booking multiple seats
+
+### **Technical Decisions**
+- **State Management:** Chose Riverpod for its simplicity and powerful features
+- **Architecture:** Implemented Clean Architecture (my first time!) to demonstrate architectural knowledge
+- **Offline Support:** Assumed the app should work without internet connectivity using local mock data
+- **Platform:** Focused on mobile-first design, optimized for both iOS and Android
+
+### **Business Logic**
+- **Travel Classes:** Assumed standard airline class structure (Economy, Premium Economy, Business, First)
+- **Trip Types:** Assumed support for One Way, Round Trip, and Multi-City options
+- **Booking Flow:** Assumed a simplified booking process for demonstration purposes
+
+
+### **UI/UX Design**
+- **Color Scheme:** Chose a blue-based theme commonly associated with travel apps
+- **Animation:** Assumed smooth transitions would enhance user experience
+- **Responsive Design:** Assumed the app should work well on various screen sizes
+- **Loading States:** Assumed users need clear feedback during data loading
+
+### **Performance**
+- **Local Storage:** Assumed favorites should persist between app sessions
+- **Image Handling:** Assumed airline logos would be provided as assets
+- **Memory Management:** Assumed efficient list handling for large flight results
+
+---
+
+## 📱 Device Requirements
+
+- **Flutter Version:** 3.0+
+- **Dart Version:** 3.0+
+- **Android:** API level 21+ (Android 5.0+)
+- **iOS:** 11.0+
+
+---
+
+## 🔍 Testing the App
+
+1. **Start with sample routes** listed in the "Sample Flight Data" section
+2. **Try different combinations** of dates, classes, and trip types
+3. **Test offline functionality** by turning off internet
+4. **Explore favorites** by tapping the heart icon on flights
+5. **Check seat assignments** when booking multiple passengers
+---
+
 ## 📸 Screenshots
 
 > *Coming soon...*

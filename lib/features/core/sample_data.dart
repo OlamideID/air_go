@@ -1,5 +1,4 @@
 final List<Map<String, dynamic>> mockFlights = [
-  // Original flights
   {
     'id': 'FL001',
     'airline': 'SkyConnect Airways',
