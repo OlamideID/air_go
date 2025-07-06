@@ -45,11 +45,11 @@ class _FlightSearchScreenState extends ConsumerState<FlightSearchScreen>
     );
     _slideAnimation =
         Tween<Offset>(begin: const Offset(0, 0.5), end: Offset.zero).animate(
-      CurvedAnimation(
-        parent: _animationController,
-        curve: Curves.easeOutCubic,
-      ),
-    );
+          CurvedAnimation(
+            parent: _animationController,
+            curve: Curves.easeOutCubic,
+          ),
+        );
     _animationController.forward();
   }
 
@@ -61,7 +61,10 @@ class _FlightSearchScreenState extends ConsumerState<FlightSearchScreen>
     super.dispose();
   }
 
-  Future<void> _selectDate(BuildContext context, {bool isReturn = false}) async {
+  Future<void> _selectDate(
+    BuildContext context, {
+    bool isReturn = false,
+  }) async {
     final picked = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
@@ -106,11 +109,15 @@ class _FlightSearchScreenState extends ConsumerState<FlightSearchScreen>
     if (_formKey.currentState!.validate() && _selectedDate != null) {
       setState(() => _isSearching = true);
 
-      ref.read(flightSearchNotifierProvider.notifier).search(
+      ref
+          .read(flightSearchNotifierProvider.notifier)
+          .search(
             departure: _departureController.text,
             arrival: _arrivalController.text,
             date: _selectedDate!,
-            returnDate: _tripType == TripType.roundTrip ? _selectedReturnDate : null,
+            returnDate: _tripType == TripType.roundTrip
+                ? _selectedReturnDate
+                : null,
             tripType: _tripType,
             travelClass: _selectedTravelClass,
             directOnly: _directOnly,
@@ -152,57 +159,58 @@ class _FlightSearchScreenState extends ConsumerState<FlightSearchScreen>
         ),
         centerTitle: true,
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: SlideTransition(
-              position: _slideAnimation,
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    FlightSearchForm(
-                      formKey: _formKey,
-                      departureController: _departureController,
-                      arrivalController: _arrivalController,
-                      selectedDate: _selectedDate,
-                      onDateTap: () => _selectDate(context),
-                    ),
-                    const SizedBox(height: 8),
-                    TripTypeSelector(
-                      tripType: _tripType,
-                      onTypeSelected: (type) => setState(() => _tripType = type),
-                    ),
-                    if (_tripType == TripType.roundTrip)
-                      ReturnDateSelector(
-                        selectedReturnDate: _selectedReturnDate,
-                        onTap: () => _selectDate(context, isReturn: true),
-                      ),
-                    const SizedBox(height: 16),
-                    OptionFilters(
-                      directOnly: _directOnly,
-                      includeNearbyAirports: _includeNearbyAirports,
-                      selectedTravelClass: _selectedTravelClass,
-                      passengers: _passengers,
-                      onDirectOnlyChanged: (value) => setState(() => _directOnly = value),
-                      onIncludeNearbyChanged: (value) => 
-                          setState(() => _includeNearbyAirports = value),
-                      onTravelClassTap: _showTravelClassSelector,
-                      onPassengerDecreased: () => setState(() => _passengers--),
-                      onPassengerIncreased: () => setState(() => _passengers++),
-                    ),
-                    const SizedBox(height: 70), // Added space before the button
-                  ],
+      body: SlideTransition(
+        position: _slideAnimation,
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                FlightSearchForm(
+                  formKey: _formKey,
+                  departureController: _departureController,
+                  arrivalController: _arrivalController,
+                  selectedDate: _selectedDate,
+                  onDateTap: () => _selectDate(context),
                 ),
-              ),
+                const SizedBox(height: 8),
+                TripTypeSelector(
+                  tripType: _tripType,
+                  onTypeSelected: (type) => setState(() => _tripType = type),
+                ),
+                if (_tripType == TripType.roundTrip)
+                  ReturnDateSelector(
+                    selectedReturnDate: _selectedReturnDate,
+                    onTap: () => _selectDate(context, isReturn: true),
+                  ),
+                const SizedBox(height: 16),
+                OptionFilters(
+                  directOnly: _directOnly,
+                  includeNearbyAirports: _includeNearbyAirports,
+                  selectedTravelClass: _selectedTravelClass,
+                  passengers: _passengers,
+                  onDirectOnlyChanged: (value) =>
+                      setState(() => _directOnly = value),
+                  onIncludeNearbyChanged: (value) =>
+                      setState(() => _includeNearbyAirports = value),
+                  onTravelClassTap: _showTravelClassSelector,
+                  onPassengerDecreased: () => setState(
+                    () => _passengers = (_passengers > 1) ? _passengers - 1 : 1,
+                  ),
+                  onPassengerIncreased: () => setState(() => _passengers++),
+                ),
+                const SizedBox(height: 24),
+                SearchButton(
+                  isSearching: _isSearching,
+                  onPressed: _searchFlights,
+                ),
+                const SizedBox(height: 24),
+              ],
             ),
           ),
-          SearchButton(
-            isSearching: _isSearching,
-            onPressed: _searchFlights,
-          ),
-        ],
+        ),
       ),
     );
   }
 }
-
