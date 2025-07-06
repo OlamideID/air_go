@@ -78,7 +78,6 @@ class FlightDetailsGrid extends StatelessWidget {
   }
 }
 
-
 class PriceInfoTile extends StatelessWidget {
   final double totalPrice;
 
@@ -87,7 +86,7 @@ class PriceInfoTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InfoTile(
-      icon: Icons.attach_money,
+      icon: Icons.receipt_long,
       label: 'Total Price: ₦${totalPrice.toStringAsFixed(2)}',
     );
   }

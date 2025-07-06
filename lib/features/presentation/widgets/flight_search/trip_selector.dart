@@ -18,13 +18,17 @@ class TripTypeSelector extends StatelessWidget {
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
         color: const Color(0xFFF1F5F9),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(20),
       ),
       child: Row(
         children: [
           Expanded(child: _buildTripTypeButton('One way', TripType.oneWay)),
-          Expanded(child: _buildTripTypeButton('Round trip', TripType.roundTrip)),
-          Expanded(child: _buildTripTypeButton('Multi-City', TripType.multiCity)),
+          Expanded(
+            child: _buildTripTypeButton('Round trip', TripType.roundTrip),
+          ),
+          Expanded(
+            child: _buildTripTypeButton('Multi-City', TripType.multiCity),
+          ),
         ],
       ),
     );
@@ -38,7 +42,7 @@ class TripTypeSelector extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(
           color: isSelected ? Colors.white : Colors.transparent,
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(20),
           boxShadow: isSelected
               ? [
                   BoxShadow(
@@ -62,4 +66,3 @@ class TripTypeSelector extends StatelessWidget {
     );
   }
 }
-
