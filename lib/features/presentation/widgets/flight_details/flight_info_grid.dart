@@ -1,5 +1,8 @@
+import 'package:flight_test/features/data/models/flight_model.dart';
 import 'package:flight_test/features/domain/entities/flight.dart';
-import 'package:flight_test/features/presentation/widgets/flight_details/flight_card.dart';
+import 'package:flight_test/features/presentation/widgets/flight_details/flight_detail_card.dart';
+import 'package:flight_test/features/presentation/widgets/flight_details/flight_info_row.dart';
+import 'package:flight_test/features/presentation/widgets/flight_details/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -71,6 +74,63 @@ class FlightDetailsGrid extends StatelessWidget {
           ],
         ),
       ],
+    );
+  }
+}
+
+
+class PriceInfoTile extends StatelessWidget {
+  final double totalPrice;
+
+  const PriceInfoTile({super.key, required this.totalPrice});
+
+  @override
+  Widget build(BuildContext context) {
+    return InfoTile(
+      icon: Icons.attach_money,
+      label: 'Total Price: ₦${totalPrice.toStringAsFixed(2)}',
+    );
+  }
+}
+
+class TripTypeInfoTile extends StatelessWidget {
+  final TripType tripType;
+
+  const TripTypeInfoTile({super.key, required this.tripType});
+
+  @override
+  Widget build(BuildContext context) {
+    return InfoTile(
+      icon: Icons.swap_horiz,
+      label: 'Trip Type: ${FlightDetailUtils.getTripTypeDisplay(tripType)}',
+    );
+  }
+}
+
+class ReturnDateInfoTile extends StatelessWidget {
+  final String returnDateText;
+
+  const ReturnDateInfoTile({super.key, required this.returnDateText});
+
+  @override
+  Widget build(BuildContext context) {
+    return InfoTile(
+      icon: Icons.calendar_today,
+      label: 'Return Date: $returnDateText',
+    );
+  }
+}
+
+class PassengerInfoTile extends StatelessWidget {
+  final dynamic state;
+
+  const PassengerInfoTile({super.key, required this.state});
+
+  @override
+  Widget build(BuildContext context) {
+    return InfoTile(
+      icon: Icons.person,
+      label: 'Passengers: ${state.passengers}',
     );
   }
 }

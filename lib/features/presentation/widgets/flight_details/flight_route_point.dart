@@ -1,8 +1,8 @@
 import 'package:flight_test/features/data/models/flight_model.dart';
+import 'package:flight_test/features/presentation/widgets/flight_details/flight_info_row.dart';
 import 'package:flight_test/features/presentation/widgets/flight_details/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flight_test/features/domain/entities/flight.dart';
-import 'package:flight_test/features/presentation/widgets/flight_details/flight_card.dart';
 
 class FlightDetailBottomSection extends StatelessWidget {
   final Flight flight;
