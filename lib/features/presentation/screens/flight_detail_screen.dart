@@ -100,7 +100,7 @@ class _FlightDetailScreenState extends ConsumerState<FlightDetailScreen>
   Widget build(BuildContext context) {
     final flight = widget.flight;
     final state = ref.watch(flightSearchNotifierProvider);
-    final totalPrice = flight.price * state.passengers;
+    final totalPrice = flight.price;
     final returnDateText =
         (flight.tripType == TripType.roundTrip && widget.returnDate != null)
         ? DateFormat.yMMMMd().format(widget.returnDate!)
