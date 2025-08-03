@@ -16,7 +16,6 @@ class FakeFlightRepository implements FlightRepository {
     int passengers = 1,
   }) async {
     final List<Flight> allFlights = [
-      // Outbound Flights
       Flight(
         id: '1',
         airline: 'Test Airline',
@@ -52,7 +51,6 @@ class FakeFlightRepository implements FlightRepository {
         passengers: passengers,
       ),
 
-      // Return Flights (for round trip)
       if (tripType == TripType.roundTrip && returnDate != null) ...[
         Flight(
           id: '1r',

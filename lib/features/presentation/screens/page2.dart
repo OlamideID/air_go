@@ -6,7 +6,7 @@ class Page2 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: const Color(0xFF8B5CF6), 
+      color: const Color(0xFF8B5CF6),
       width: double.infinity,
       height: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -22,10 +22,7 @@ class Page2 extends StatelessWidget {
             ),
             child: Padding(
               padding: const EdgeInsets.all(16.0),
-              child: Image.asset(
-                'assets/2.png',
-                fit: BoxFit.contain,
-              ),
+              child: Image.asset('assets/2.png', fit: BoxFit.contain),
             ),
           ),
           const SizedBox(height: 40),
@@ -41,10 +38,7 @@ class Page2 extends StatelessWidget {
           const SizedBox(height: 16),
           const Text(
             'Find the best deals on flights from\nmultiple airlines in one place.',
-            style: TextStyle(
-              color: Colors.white70,
-              fontSize: 16,
-            ),
+            style: TextStyle(color: Colors.white70, fontSize: 16),
             textAlign: TextAlign.center,
           ),
         ],
